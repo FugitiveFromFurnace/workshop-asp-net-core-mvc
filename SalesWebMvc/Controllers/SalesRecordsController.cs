@@ -20,20 +20,29 @@ namespace SalesWebMvc.Controllers
 
         public async Task<IActionResult> SimpleSearch(DateTime? minDate, DateTime? maxDate)
         {
-            minDate = minDate ?? new DateTime(DateTime.Now.Year, 1, 1);
-            maxDate = maxDate ?? DateTime.Now;
+            var tupla = ValidateDate(minDate, maxDate);
 
-            ViewData["minDate"] = minDate.Value.ToString("yyyy-MM-dd");
-            ViewData["maxDate"] = maxDate.Value.ToString("yyyy-MM-dd");
+            ViewData["minDate"] = tupla.minDate.ToString("yyyy-MM-dd");
+            ViewData["maxDate"] = tupla.maxDate.ToString("yyyy-MM-dd");
 
             var result = await _salesRecordService.FindByDateAsync(minDate, maxDate);  
 
             return View(result);
         }
 
-        public IActionResult GroupingSearch()
+
+        public async Task<IActionResult> GroupingSearch(DateTime? minDate, DateTime? maxDate)
         {
-            return View();
+            var tupla = ValidateDate(minDate, maxDate);
+
+            ViewData["minDate"] = tupla.minDate.ToString("yyyy-MM-dd");
+            ViewData["maxDate"] = tupla.maxDate.ToString("yyyy-MM-dd");
+
+            var result = await _salesRecordService.FindByDateGroupingAsync(minDate, maxDate);
+
+            return View(result);
         }
+
+        private (DateTime minDate, DateTime maxDate) ValidateDate(DateTime? minDate, DateTime? maxDate) => (minDate ?? new DateTime(DateTime.Now.Year, 1, 1), maxDate ?? DateTime.Now);
     }
 }
